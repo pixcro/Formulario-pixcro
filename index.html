@@ -611,14 +611,12 @@
                     return response.text();
                 })
                 .then(data => {
-                    // Separar líneas y procesar cada cupón
                     const lines = data.split('\n').map(line => line.trim()).filter(line => line);
                     lines.forEach(line => {
-                        // Usar una expresión regular para extraer código y porcentaje
                         const match = line.match(/^"(\w+)\s\((-?\d+%)\)"$/);
                         if (match) {
-                            const code = match[1].toUpperCase(); // Ej: "PX1234"
-                            const discount = parseInt(match[2].replace('%', '')) / 100; // Ej: 0.10
+                            const code = match[1].toUpperCase();
+                            const discount = parseInt(match[2].replace('%', '')) / 100; // Ej: 0.10 para 10%
                             coupons[code] = discount;
                         }
                     });
@@ -658,10 +656,19 @@
             // Calcular total con descuento
             const calculateTotal = () => {
                 const basePrice = parseFloat(paqueteSelect.value) || 0;
-                let discount = appliedCoupon && coupons[appliedCoupon] ? coupons[appliedCoupon] : 0;
+                let finalPrice = basePrice;
 
-                const discountedPrice = basePrice * (1 - discount);
-                const finalPrice = expressCheckbox.checked ? discountedPrice * 1.5 : discountedPrice;
+                // Aplicar descuento si hay un cupón válido
+                if (appliedCoupon && coupons[appliedCoupon]) {
+                    const discount = coupons[appliedCoupon]; // Ej: 0.10 para 10%
+                    finalPrice = basePrice * (1 - discount); // Resta el porcentaje de descuento
+                }
+
+                // Aplicar aumento por entrega express si está seleccionado
+                if (expressCheckbox.checked) {
+                    finalPrice *= 1.5; // Aumenta un 50%
+                }
+
                 totalSpan.textContent = `$${finalPrice.toFixed(2)}`;
             };
 
