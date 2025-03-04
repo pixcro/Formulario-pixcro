@@ -208,10 +208,10 @@
             background-color: var(--input-background);
             padding: 1.5rem;
             border-radius: var(--border-radius);
-            text-align: center;
             margin: 2rem 0;
             position: relative;
             overflow: hidden;
+            font-size: 1rem;
         }
 
         .total-container::before {
@@ -226,11 +226,33 @@
             z-index: -1;
         }
 
-        .total-amount {
-            font-size: 1.75rem;
+        .total-breakdown {
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        .total-breakdown div {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+        }
+
+        .total-breakdown .label {
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .total-breakdown .value {
             font-weight: 700;
             color: var(--primary-color);
             text-shadow: 0 0 8px var(--primary-color);
+        }
+
+        .total-breakdown .total {
+            border-top: 1px solid rgba(191, 64, 191, 0.5);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            font-size: 1.25rem;
         }
 
         button {
@@ -355,7 +377,8 @@
             textarea { min-height: 100px; }
             .checkmark { width: 0.5rem; height: 0.5rem; right: 0.75rem; top: 2.25rem; }
             .total-container { padding: 1rem; margin: 1.5rem 0; }
-            .total-amount { font-size: 1.5rem; }
+            .total-breakdown { font-size: 0.875rem; }
+            .total-breakdown .total { font-size: 1.125rem; }
             button { padding: 0.875rem; font-size: 1rem; }
             .modal-content { padding: 1rem; max-width: 90%; }
             .modal-buttons { gap: 0.5rem; }
@@ -561,12 +584,17 @@
                 </div>
                 <div class="form-group">
                     <label for="coupon">Código de Cupón</label>
-                    <input type="text" id="coupon" name="coupon" placeholder="Ejemplo: PX-001">
+                    <input type="text" id="coupon" name="coupon" placeholder="Ejemplo: Px1234">
                     <button type="button" id="validateCoupon">Validar Cupón</button>
                     <span class="example" id="couponStatus">Ingresa un cupón y valida</span>
                 </div>
                 <div class="total-container">
-                    <div class="total-amount" id="total">$0.00</div>
+                    <div class="total-breakdown" id="totalBreakdown">
+                        <div><span class="label">Paquete:</span><span class="value" id="packageAmount">$0.00</span></div>
+                        <div><span class="label">Servicio Express:</span><span class="value" id="expressAmount">$0.00</span></div>
+                        <div><span class="label">Cupón de descuento:</span><span class="value" id="discountAmount">-$0.00</span></div>
+                        <div class="total"><span class="label">Total:</span><span class="value" id="totalAmount">$0.00</span></div>
+                    </div>
                 </div>
                 <button type="submit">Enviar Solicitud</button>
             </div>
@@ -591,20 +619,22 @@
             const cancelButton = document.getElementById('modalCancelButton');
             const paqueteSelect = document.getElementById('paquete');
             const expressCheckbox = document.getElementById('express');
-            const totalSpan = document.getElementById('total');
             const couponInput = document.getElementById('coupon');
             const validateButton = document.getElementById('validateCoupon');
             const couponStatus = document.getElementById('couponStatus');
+            const packageAmount = document.getElementById('packageAmount');
+            const expressAmount = document.getElementById('expressAmount');
+            const discountAmount = document.getElementById('discountAmount');
+            const totalAmount = document.getElementById('totalAmount');
 
             const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
-            let coupons = {}; // Objeto para almacenar códigos y sus descuentos
+            let coupons = {};
             let appliedCoupon = null;
 
             const validateField = (input, checkmark) => {
                 checkmark.style.display = input.checkValidity() && input.value.trim() ? 'block' : 'none';
             };
 
-            // Cargar cupones desde cupones.txt
             fetch('cupones.txt')
                 .then(response => {
                     if (!response.ok) throw new Error('No se pudo cargar cupones.txt');
@@ -613,10 +643,10 @@
                 .then(data => {
                     const lines = data.split('\n').map(line => line.trim()).filter(line => line);
                     lines.forEach(line => {
-                        const match = line.match(/^"(\w+)\s\((-?\d+%)\)"$/);
+                        const match = line.match(/^"(\w+)\s\((\d+%)\)"$/);
                         if (match) {
                             const code = match[1].toUpperCase();
-                            const discount = parseInt(match[2].replace('%', '')) / 100; // Ej: 0.10 para 10%
+                            const discount = parseInt(match[2].replace('%', '')) / 100;
                             coupons[code] = discount;
                         }
                     });
@@ -628,7 +658,6 @@
                     couponStatus.style.color = '#ff4444';
                 });
 
-            // Validar cupón
             validateButton.addEventListener('click', () => {
                 const enteredCoupon = couponInput.value.trim().toUpperCase();
                 if (!enteredCoupon) {
@@ -653,23 +682,19 @@
                 }
             });
 
-            // Calcular total con descuento
             const calculateTotal = () => {
                 const basePrice = parseFloat(paqueteSelect.value) || 0;
-                let finalPrice = basePrice;
+                let discount = appliedCoupon && coupons[appliedCoupon] ? coupons[appliedCoupon] : 0;
+                const discountValue = basePrice * discount;
+                let finalPrice = basePrice - discountValue;
 
-                // Aplicar descuento si hay un cupón válido
-                if (appliedCoupon && coupons[appliedCoupon]) {
-                    const discount = coupons[appliedCoupon]; // Ej: 0.10 para 10%
-                    finalPrice = basePrice * (1 - discount); // Resta el porcentaje de descuento
-                }
+                const expressCost = expressCheckbox.checked ? finalPrice * 0.5 : 0;
+                finalPrice += expressCost;
 
-                // Aplicar aumento por entrega express si está seleccionado
-                if (expressCheckbox.checked) {
-                    finalPrice *= 1.5; // Aumenta un 50%
-                }
-
-                totalSpan.textContent = `$${finalPrice.toFixed(2)}`;
+                packageAmount.textContent = `$${basePrice.toFixed(2)}`;
+                expressAmount.textContent = `$${expressCost.toFixed(2)}`;
+                discountAmount.textContent = `-$${discountValue.toFixed(2)}`;
+                totalAmount.textContent = `$${finalPrice.toFixed(2)}`;
             };
 
             paqueteSelect.addEventListener('change', () => {
@@ -729,7 +754,7 @@
                 message += `Paquete: ${paqueteSelect.options[paqueteSelect.selectedIndex].text}\n`;
                 message += `Express: ${formData.get('express') ? 'Sí (+50%)' : 'No'}\n`;
                 message += `Cupón: ${appliedCoupon || 'Ninguno'}\n`;
-                message += `Total: ${totalSpan.textContent}`;
+                message += `Total: ${totalAmount.textContent}`;
 
                 return encodeURIComponent(message);
             };
@@ -739,7 +764,10 @@
                 window.open(whatsappUrl, '_blank');
                 modal.style.display = 'none';
                 form.reset();
-                totalSpan.textContent = '$0.00';
+                packageAmount.textContent = '$0.00';
+                expressAmount.textContent = '$0.00';
+                discountAmount.textContent = '-$0.00';
+                totalAmount.textContent = '$0.00';
                 appliedCoupon = null;
                 couponStatus.textContent = 'Ingresa un cupón y valida';
                 couponStatus.style.color = 'rgba(255, 255, 255, 0.6)';
