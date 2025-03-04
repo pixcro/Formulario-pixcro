@@ -597,7 +597,7 @@
             const couponStatus = document.getElementById('couponStatus');
 
             const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
-            let coupons = [];
+            let coupons = {}; // Objeto para almacenar códigos y sus descuentos
             let appliedCoupon = null;
 
             const validateField = (input, checkmark) => {
@@ -611,7 +611,17 @@
                     return response.text();
                 })
                 .then(data => {
-                    coupons = data.split('\n').map(line => line.trim()).filter(line => line);
+                    // Separar líneas y procesar cada cupón
+                    const lines = data.split('\n').map(line => line.trim()).filter(line => line);
+                    lines.forEach(line => {
+                        // Usar una expresión regular para extraer código y porcentaje
+                        const match = line.match(/^"(\w+)\s\((-?\d+%)\)"$/);
+                        if (match) {
+                            const code = match[1].toUpperCase(); // Ej: "PX1234"
+                            const discount = parseInt(match[2].replace('%', '')) / 100; // Ej: 0.10
+                            coupons[code] = discount;
+                        }
+                    });
                     console.log('Cupones cargados:', coupons);
                 })
                 .catch(error => {
@@ -631,8 +641,9 @@
                     return;
                 }
 
-                if (coupons.includes(enteredCoupon)) {
-                    couponStatus.textContent = `¡Cupón ${enteredCoupon} válido! Descuento aplicado.`;
+                if (coupons.hasOwnProperty(enteredCoupon)) {
+                    const discountPercent = coupons[enteredCoupon] * 100;
+                    couponStatus.textContent = `¡Cupón ${enteredCoupon} válido! ${discountPercent}% de descuento aplicado.`;
                     couponStatus.style.color = '#00cc00';
                     appliedCoupon = enteredCoupon;
                     calculateTotal();
@@ -647,17 +658,7 @@
             // Calcular total con descuento
             const calculateTotal = () => {
                 const basePrice = parseFloat(paqueteSelect.value) || 0;
-                let discount = 0;
-
-                if (appliedCoupon) {
-                    switch (appliedCoupon) {
-                        case 'PX-001': discount = 0.10; break; // 10%
-                        case 'PX-002': discount = 0.20; break; // 20%
-                        case 'PX-003': discount = 0.30; break; // 30%
-                        case 'PX-004': discount = 0.40; break; // 40%
-                        case 'PX-005': discount = 0.50; break; // 50%
-                    }
-                }
+                let discount = appliedCoupon && coupons[appliedCoupon] ? coupons[appliedCoupon] : 0;
 
                 const discountedPrice = basePrice * (1 - discount);
                 const finalPrice = expressCheckbox.checked ? discountedPrice * 1.5 : discountedPrice;
@@ -758,4 +759,4 @@
         });
     </script>
 </body>
-                        </html>
+</html>
