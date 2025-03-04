@@ -271,6 +271,28 @@
             box-shadow: 0 0 15px var(--primary-color);
         }
 
+        #validateCoupon {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            transition: var(--transition);
+        }
+
+        #validateCoupon:hover {
+            background-color: #a832a8;
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        #couponStatus {
+            display: block;
+            margin-top: 0.5rem;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -338,18 +360,9 @@
             .modal-content { padding: 1rem; max-width: 90%; }
             .modal-buttons { gap: 0.5rem; }
             .modal-buttons button { padding: 0.5rem; font-size: 0.875rem; }
-
-            .checkbox-option {
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            input[type="checkbox"], input[type="radio"] {
-                margin-right: 0.5rem;
-            }
-            .checkbox-option label {
-                font-size: 0.875rem;
-                line-height: 1.2;
-            }
+            .checkbox-option { align-items: flex-start; gap: 0.5rem; }
+            input[type="checkbox"], input[type="radio"] { margin-right: 0.5rem; }
+            .checkbox-option label { font-size: 0.875rem; line-height: 1.2; }
         }
 
         @media (max-width: 480px) {
@@ -546,6 +559,12 @@
                     <label for="express">Entrega Express (+50%)</label>
                     <span class="example">Si deseas recibir tu diseño en 24-48 horas, selecciona esta opción.</span>
                 </div>
+                <div class="form-group">
+                    <label for="coupon">Código de Cupón</label>
+                    <input type="text" id="coupon" name="coupon" placeholder="Ejemplo: PX-001">
+                    <button type="button" id="validateCoupon">Validar Cupón</button>
+                    <span class="example" id="couponStatus">Ingresa un cupón y valida</span>
+                </div>
                 <div class="total-container">
                     <div class="total-amount" id="total">$0.00</div>
                 </div>
@@ -573,17 +592,76 @@
             const paqueteSelect = document.getElementById('paquete');
             const expressCheckbox = document.getElementById('express');
             const totalSpan = document.getElementById('total');
+            const couponInput = document.getElementById('coupon');
+            const validateButton = document.getElementById('validateCoupon');
+            const couponStatus = document.getElementById('couponStatus');
 
             const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+            let coupons = [];
+            let appliedCoupon = null;
 
             const validateField = (input, checkmark) => {
                 checkmark.style.display = input.checkValidity() && input.value.trim() ? 'block' : 'none';
             };
 
+            // Cargar cupones desde cupones.txt
+            fetch('cupones.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error('No se pudo cargar cupones.txt');
+                    return response.text();
+                })
+                .then(data => {
+                    coupons = data.split('\n').map(line => line.trim()).filter(line => line);
+                    console.log('Cupones cargados:', coupons);
+                })
+                .catch(error => {
+                    console.error('Error al cargar cupones:', error);
+                    couponStatus.textContent = 'Error al cargar los cupones';
+                    couponStatus.style.color = '#ff4444';
+                });
+
+            // Validar cupón
+            validateButton.addEventListener('click', () => {
+                const enteredCoupon = couponInput.value.trim().toUpperCase();
+                if (!enteredCoupon) {
+                    couponStatus.textContent = 'Por favor, ingresa un cupón';
+                    couponStatus.style.color = '#ff4444';
+                    appliedCoupon = null;
+                    calculateTotal();
+                    return;
+                }
+
+                if (coupons.includes(enteredCoupon)) {
+                    couponStatus.textContent = `¡Cupón ${enteredCoupon} válido! Descuento aplicado.`;
+                    couponStatus.style.color = '#00cc00';
+                    appliedCoupon = enteredCoupon;
+                    calculateTotal();
+                } else {
+                    couponStatus.textContent = 'Cupón no válido';
+                    couponStatus.style.color = '#ff4444';
+                    appliedCoupon = null;
+                    calculateTotal();
+                }
+            });
+
+            // Calcular total con descuento
             const calculateTotal = () => {
                 const basePrice = parseFloat(paqueteSelect.value) || 0;
-                const total = expressCheckbox.checked ? basePrice * 1.5 : basePrice;
-                totalSpan.textContent = `$${total.toFixed(2)}`;
+                let discount = 0;
+
+                if (appliedCoupon) {
+                    switch (appliedCoupon) {
+                        case 'PX-001': discount = 0.10; break; // 10%
+                        case 'PX-002': discount = 0.20; break; // 20%
+                        case 'PX-003': discount = 0.30; break; // 30%
+                        case 'PX-004': discount = 0.40; break; // 40%
+                        case 'PX-005': discount = 0.50; break; // 50%
+                    }
+                }
+
+                const discountedPrice = basePrice * (1 - discount);
+                const finalPrice = expressCheckbox.checked ? discountedPrice * 1.5 : discountedPrice;
+                totalSpan.textContent = `$${finalPrice.toFixed(2)}`;
             };
 
             paqueteSelect.addEventListener('change', () => {
@@ -642,6 +720,7 @@
                 message += "*💰 Paquete*\n";
                 message += `Paquete: ${paqueteSelect.options[paqueteSelect.selectedIndex].text}\n`;
                 message += `Express: ${formData.get('express') ? 'Sí (+50%)' : 'No'}\n`;
+                message += `Cupón: ${appliedCoupon || 'Ninguno'}\n`;
                 message += `Total: ${totalSpan.textContent}`;
 
                 return encodeURIComponent(message);
@@ -653,6 +732,9 @@
                 modal.style.display = 'none';
                 form.reset();
                 totalSpan.textContent = '$0.00';
+                appliedCoupon = null;
+                couponStatus.textContent = 'Ingresa un cupón y valida';
+                couponStatus.style.color = 'rgba(255, 255, 255, 0.6)';
                 document.querySelectorAll('.checkmark').forEach(check => check.style.display = 'none');
             });
 
@@ -676,4 +758,4 @@
         });
     </script>
 </body>
-</html>
+                                                                 </html>
