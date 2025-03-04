@@ -129,7 +129,7 @@
 
         .form-group { margin-bottom: 1.75rem; position: relative; }
         label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 1rem; }
-        .example { color: rgba(255, 255, 255, 0.6); font-size: 0.875rem; margin-top: 0.25rem; }
+        .example { color: #b0b0b0; font-size: 0.875rem; margin-top: 0.25rem; }
 
         input, select, textarea {
             width: 100%;
@@ -237,6 +237,11 @@
             padding: 0.25rem 0;
         }
 
+        .total-breakdown div:hover {
+            background-color: rgba(191, 64, 191, 0.05);
+            transition: background-color 0.2s ease;
+        }
+
         .total-breakdown .label {
             font-weight: 500;
             color: #fff;
@@ -249,9 +254,10 @@
         }
 
         .total-breakdown .total {
-            border-top: 1px solid rgba(191, 64, 191, 0.5);
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
+            border-top: 2px solid var(--primary-color);
+            background-color: rgba(191, 64, 191, 0.1);
+            padding: 0.5rem 0;
+            margin-top: 0.75rem;
             font-size: 1.25rem;
         }
 
@@ -313,6 +319,25 @@
         #couponStatus {
             display: block;
             margin-top: 0.5rem;
+        }
+
+        #comisionMensaje {
+            display: none;
+            color: #ffcc00;
+            background-color: rgba(255, 204, 0, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .form-group:hover #comisionMensaje {
+            display: block;
+            position: absolute;
+            background: #2f3336;
+            padding: 0.5rem;
+            border-radius: 4px;
+            z-index: 10;
+            top: 100%;
+            left: 0;
         }
 
         .modal {
@@ -588,15 +613,40 @@
                     <button type="button" id="validateCoupon">Validar Cupón</button>
                     <span class="example" id="couponStatus">Ingresa un cupón y valida</span>
                 </div>
+                <div class="form-group">
+                    <label for="metodo-pago">Método de Pago *</label>
+                    <select id="metodo-pago" name="metodo-pago" required>
+                        <option value="" disabled selected>Selecciona un método de pago</option>
+                        <option value="pago-movil">Pago Móvil</option>
+                        <option value="transferencia-banesco">Transferencia Banesco</option>
+                        <option value="transferencia-venezuela">Transferencia Venezuela</option>
+                        <option value="usdt">USDT (El Dorado/Binance)</option>
+                        <option value="zinli">Zinli</option>
+                        <option value="wally">Wally</option>
+                        <option value="wise">Wise</option>
+                        <option value="meru">Meru</option>
+                        <option value="airtm">AirTm</option>
+                    </select>
+                    <span class="checkmark" id="metodoPagoCheck"></span>
+                    <span class="example" id="comisionMensaje" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12" y2="16"></line>
+                        </svg>
+                        Este método tiene una comisión adicional del 8% sobre el monto total.
+                    </span>
+                </div>
                 <div class="total-container">
                     <div class="total-breakdown" id="totalBreakdown">
                         <div><span class="label">Paquete:</span><span class="value" id="packageAmount">$0.00</span></div>
                         <div><span class="label">Servicio Express:</span><span class="value" id="expressAmount">$0.00</span></div>
                         <div><span class="label">Cupón de descuento:</span><span class="value" id="discountAmount">-$0.00</span></div>
+                        <div id="comisionRow" style="display: none;"><span class="label">Comisión método de pago (8%):</span><span class="value" id="comisionAmount">$0.00</span></div>
                         <div class="total"><span class="label">Total:</span><span class="value" id="totalAmount">$0.00</span></div>
                     </div>
                 </div>
-                <button type="submit">Enviar Solicitud</button>
+                <button type="submit">Confirmar y Enviar a WhatsApp</button>
             </div>
         </form>
     </div>
@@ -622,9 +672,13 @@
             const couponInput = document.getElementById('coupon');
             const validateButton = document.getElementById('validateCoupon');
             const couponStatus = document.getElementById('couponStatus');
+            const metodoPagoSelect = document.getElementById('metodo-pago');
+            const comisionMensaje = document.getElementById('comisionMensaje');
             const packageAmount = document.getElementById('packageAmount');
             const expressAmount = document.getElementById('expressAmount');
             const discountAmount = document.getElementById('discountAmount');
+            const comisionAmount = document.getElementById('comisionAmount');
+            const comisionRow = document.getElementById('comisionRow');
             const totalAmount = document.getElementById('totalAmount');
 
             const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
@@ -682,6 +736,20 @@
                 }
             });
 
+            couponInput.addEventListener('input', () => {
+                const enteredCoupon = couponInput.value.trim().toUpperCase();
+                if (enteredCoupon && coupons.hasOwnProperty(enteredCoupon)) {
+                    couponStatus.textContent = 'Cupón válido';
+                    couponStatus.style.color = '#00cc00';
+                } else if (enteredCoupon) {
+                    couponStatus.textContent = 'Cupón no válido';
+                    couponStatus.style.color = '#ff4444';
+                } else {
+                    couponStatus.textContent = 'Ingresa un cupón y valida';
+                    couponStatus.style.color = '#b0b0b0';
+                }
+            });
+
             const calculateTotal = () => {
                 const basePrice = parseFloat(paqueteSelect.value) || 0;
                 let discount = appliedCoupon && coupons[appliedCoupon] ? coupons[appliedCoupon] : 0;
@@ -691,10 +759,19 @@
                 const expressCost = expressCheckbox.checked ? finalPrice * 0.5 : 0;
                 finalPrice += expressCost;
 
+                const metodosConComision = ['zinli', 'wally', 'wise', 'meru', 'airtm'];
+                const metodoSeleccionado = metodoPagoSelect.value;
+                const comision = metodosConComision.includes(metodoSeleccionado) ? finalPrice * 0.08 : 0;
+                finalPrice += comision;
+
                 packageAmount.textContent = `$${basePrice.toFixed(2)}`;
                 expressAmount.textContent = `$${expressCost.toFixed(2)}`;
                 discountAmount.textContent = `-$${discountValue.toFixed(2)}`;
+                comisionAmount.textContent = `$${comision.toFixed(2)}`;
+                comisionRow.style.display = comision > 0 ? 'flex' : 'none';
                 totalAmount.textContent = `$${finalPrice.toFixed(2)}`;
+
+                comisionMensaje.style.display = comision > 0 ? 'block' : 'none';
             };
 
             paqueteSelect.addEventListener('change', () => {
@@ -703,6 +780,11 @@
             });
 
             expressCheckbox.addEventListener('change', calculateTotal);
+
+            metodoPagoSelect.addEventListener('change', () => {
+                calculateTotal();
+                validateField(metodoPagoSelect, document.getElementById('metodoPagoCheck'));
+            });
 
             requiredFields.forEach(field => {
                 const checkmark = document.getElementById(`${field.id}Check`);
@@ -752,26 +834,35 @@
 
                 message += "*💰 Paquete*\n";
                 message += `Paquete: ${paqueteSelect.options[paqueteSelect.selectedIndex].text}\n`;
-                message += `Express: ${formData.get('express') ? 'Sí (+50%)' : 'No'}\n`;
-                message += `Cupón: ${appliedCoupon || 'Ninguno'}\n`;
+                message += `Express: ${expressAmount.textContent}\n`;
+                message += `Cupón: ${discountAmount.textContent} (${appliedCoupon || 'Ninguno'})\n`;
+                message += `Comisión método de pago: ${comisionAmount.textContent}\n`;
+                message += `Método de Pago: ${metodoPagoSelect.options[metodoPagoSelect.selectedIndex].text}\n`;
                 message += `Total: ${totalAmount.textContent}`;
 
                 return encodeURIComponent(message);
             };
 
             acceptButton.addEventListener('click', () => {
+                acceptButton.textContent = 'Enviando...';
                 const whatsappUrl = `https://wa.me/+584121138338?text=${generateWhatsAppMessage()}`;
                 window.open(whatsappUrl, '_blank');
-                modal.style.display = 'none';
-                form.reset();
-                packageAmount.textContent = '$0.00';
-                expressAmount.textContent = '$0.00';
-                discountAmount.textContent = '-$0.00';
-                totalAmount.textContent = '$0.00';
-                appliedCoupon = null;
-                couponStatus.textContent = 'Ingresa un cupón y valida';
-                couponStatus.style.color = 'rgba(255, 255, 255, 0.6)';
-                document.querySelectorAll('.checkmark').forEach(check => check.style.display = 'none');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    form.reset();
+                    acceptButton.textContent = 'Aceptar';
+                    packageAmount.textContent = '$0.00';
+                    expressAmount.textContent = '$0.00';
+                    discountAmount.textContent = '-$0.00';
+                    comisionAmount.textContent = '$0.00';
+                    comisionRow.style.display = 'none';
+                    totalAmount.textContent = '$0.00';
+                    appliedCoupon = null;
+                    couponStatus.textContent = 'Ingresa un cupón y valida';
+                    couponStatus.style.color = '#b0b0b0';
+                    comisionMensaje.style.display = 'none';
+                    document.querySelectorAll('.checkmark').forEach(check => check.style.display = 'none');
+                }, 500);
             });
 
             cancelButton.addEventListener('click', () => modal.style.display = 'none');
