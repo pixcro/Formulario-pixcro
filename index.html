@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Solicitud de Diseño de Logo - Pixcro</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -34,51 +34,8 @@
             justify-content: center;
             padding: 1rem;
             line-height: 1.5;
-            font-size: 14px;
-            overflow-x: hidden; /* Evitar scroll horizontal por animaciones */
-        }
-
-        /* Barra de progreso */
-        .progress-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 40px;
-            background-color: #2f3336;
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            padding: 0 1rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        .progress-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-glow) 50%, var(--primary-color) 100%);
-            background-size: 200% 100%;
-            animation: liquidFlow 3s linear infinite;
-            border-radius: var(--border-radius);
-            transition: width 0.5s ease;
-            box-shadow: 0 0 15px var(--primary-color);
-        }
-
-        @keyframes liquidFlow {
-            0% { background-position: 0% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .progress-text {
-            position: relative;
-            z-index: 1;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-color);
-            text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+            font-size: 16px;
+            overflow-x: hidden;
         }
 
         .container {
@@ -86,41 +43,26 @@
             padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            max-width: 650px;
+            max-width: 700px;
             width: 100%;
-            animation: fadeIn 0.5s ease-in-out;
-            margin-top: 40px;
-            position: relative;
-            z-index: 1; /* Debajo de la barra de progreso */
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-                margin-top: 40px;
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            margin: 1rem auto;
         }
 
         h1 {
             text-align: center;
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             color: var(--primary-color);
             text-shadow: 0 0 10px var(--primary-color);
         }
 
         .form-intro {
             background: var(--input-background);
-            padding: 1.25rem;
+            padding: 1.5rem;
             border-radius: var(--border-radius);
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            font-size: 1rem;
             position: relative;
             overflow: hidden;
         }
@@ -144,77 +86,80 @@
         }
 
         .form-intro p {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .form-intro ul {
-            padding-left: 1.25rem;
-            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            margin: 0.75rem 0;
         }
 
         .section {
             position: relative;
             margin-bottom: 2rem;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: var(--border-radius);
-            background: rgba(22, 24, 28, 0.95);
-            box-shadow: inset 0 0 10px rgba(191, 64, 191, 0.1);
-            overflow: hidden;
+            background: var(--card-background);
+            border: 1px solid transparent;
+            transition: box-shadow 0.5s ease, opacity 0.6s ease-out, transform 0.6s ease-out; /* Añadido transition para opacity y transform */
         }
 
-        .section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(191, 64, 191, 0.3), transparent);
-            animation: ledStrip 4s linear infinite;
-            z-index: -1;
+        .section.visible {
+            box-shadow: 0 0 15px rgba(191, 64, 191, 0.3),
+                       0 0 25px rgba(224, 102, 224, 0.2);
+            border: 1px solid rgba(191, 64, 191, 0.2);
+            animation: borderGlow 4s ease-in-out infinite;
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        @keyframes ledStrip {
-            0% { transform: translateX(-100%) translateY(-100%); }
-            100% { transform: translateX(100%) translateY(100%); }
+        .section:not(.visible) {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        @keyframes borderGlow {
+            0% { box-shadow: 0 0 15px rgba(191, 64, 191, 0.3), 0 0 25px rgba(224, 102, 224, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(191, 64, 191, 0.4), 0 0 30px rgba(224, 102, 224, 0.3); }
+            100% { box-shadow: 0 0 15px rgba(191, 64, 191, 0.3), 0 0 25px rgba(224, 102, 224, 0.2); }
         }
 
         .section-title {
             color: var(--primary-color);
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 1rem;
-            padding-bottom: 0.4rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--primary-color);
             text-shadow: 0 0 6px var(--primary-color);
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
             position: relative;
         }
 
         label {
             display: block;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
 
         .example {
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.8rem;
-            margin-top: 0.2rem;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.875rem;
             border: 1px solid var(--input-background);
             border-radius: var(--border-radius);
             background-color: var(--input-background);
             color: var(--input-text-color);
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-family: 'Montserrat', sans-serif;
             transition: var(--transition);
             line-height: 1.4;
@@ -222,7 +167,7 @@
         }
 
         textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
         }
 
@@ -230,8 +175,8 @@
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23fff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 6.344C1.875 5.768 2.32 4.8 3.104 4.8h9.792c.784 0 1.229.968.653 1.544L8.753 11.14a.5.5 0 0 1-.706 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            padding-right: 2rem;
+            background-position: right 0.875rem center;
+            padding-right: 2.5rem;
         }
 
         input:focus, select:focus, textarea:focus {
@@ -242,12 +187,12 @@
 
         .checkmark {
             position: absolute;
-            width: 0.5rem;
-            height: 0.5rem;
+            width: 0.6rem;
+            height: 0.6rem;
             background-color: var(--primary-color);
             border-radius: 50%;
-            right: 0.75rem;
-            top: 2.25rem;
+            right: 1rem;
+            top: 2.5rem;
             display: none;
             animation: popIn 0.3s ease;
             box-shadow: 0 0 8px var(--primary-color), 0 0 12px rgba(191, 64, 191, 0.6);
@@ -259,29 +204,29 @@
         }
 
         .checkbox-container {
-            margin: 0.5rem 0;
+            margin: 0.75rem 0;
         }
 
         .checkbox-option {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin: 0.4rem 0;
+            gap: 0.75rem;
+            margin: 0.5rem 0;
         }
 
         input[type="checkbox"], input[type="radio"] {
             accent-color: var(--primary-color);
-            width: 1.1rem;
-            height: 1.1rem;
+            width: 1.25rem;
+            height: 1.25rem;
             margin: 0;
         }
 
         .total-container {
             background-color: var(--input-background);
-            padding: 1.25rem;
+            padding: 1.5rem;
             border-radius: var(--border-radius);
             text-align: center;
-            margin: 1.5rem 0;
+            margin: 2rem 0;
             position: relative;
             overflow: hidden;
         }
@@ -299,7 +244,7 @@
         }
 
         .total-amount {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--primary-color);
             text-shadow: 0 0 8px var(--primary-color);
@@ -308,11 +253,11 @@
         button {
             background-color: var(--primary-color);
             color: var(--text-color);
-            padding: 0.9rem;
+            padding: 1rem;
             border: none;
             border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 500;
             width: 100%;
             transition: var(--transition);
@@ -353,7 +298,7 @@
             background-color: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
         }
 
         .modal-content {
@@ -382,23 +327,118 @@
 
         .modal-buttons {
             display: flex;
-            gap: 0.75rem;
+            gap: 1rem;
             margin-top: 1.5rem;
         }
 
         .modal-buttons button {
             flex: 1;
-            padding: 0.65rem;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        /* Eliminado .fade-in como clase separada, ahora integrado en .section */
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 1rem;
+                margin: 0.5rem auto;
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-intro {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+                font-size: 0.875rem;
+            }
+
+            .section {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            label {
+                font-size: 0.875rem;
+            }
+
+            input, select, textarea {
+                padding: 0.75rem;
+                font-size: 0.875rem;
+            }
+
+            textarea {
+                min-height: 100px;
+            }
+
+            .checkmark {
+                width: 0.5rem;
+                height: 0.5rem;
+                right: 0.75rem;
+                top: 2.25rem;
+            }
+
+            .total-container {
+                padding: 1rem;
+                margin: 1.5rem 0;
+            }
+
+            .total-amount {
+                font-size: 1.5rem;
+            }
+
+            button {
+                padding: 0.875rem;
+                font-size: 1rem;
+            }
+
+            .modal-content {
+                padding: 1rem;
+                max-width: 90%;
+            }
+
+            .modal-buttons {
+                gap: 0.5rem;
+            }
+
+            .modal-buttons button {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .checkbox-option {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+
+            input[type="checkbox"], input[type="radio"] {
+                width: 1rem;
+                height: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Barra de progreso -->
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-        <span class="progress-text">Progreso del formulario</span>
-    </div>
-
     <div class="container">
         <h1>Solicitud de Diseño de Logo - Pixcro</h1>
 
@@ -422,21 +462,18 @@
                     <span class="checkmark" id="nombreCheck"></span>
                     <span class="example">Tu nombre personal</span>
                 </div>
-
                 <div class="form-group">
                     <label for="apellido">Apellido *</label>
                     <input type="text" id="apellido" name="apellido" required placeholder="Ejemplo: González">
                     <span class="checkmark" id="apellidoCheck"></span>
                     <span class="example">Tu apellido</span>
                 </div>
-
                 <div class="form-group">
                     <label for="correo">Correo Electrónico *</label>
                     <input type="email" id="correo" name="correo" required placeholder="Ejemplo: contacto@miempresa.com">
                     <span class="checkmark" id="correoCheck"></span>
                     <span class="example">Usa un correo activo</span>
                 </div>
-
                 <div class="form-group">
                     <label for="telefono">Teléfono</label>
                     <input type="tel" id="telefono" name="telefono" placeholder="Ejemplo: +58 412 1234567">
@@ -452,28 +489,24 @@
                     <span class="checkmark" id="businessCheck"></span>
                     <span class="example">Nombre comercial de tu proyecto</span>
                 </div>
-
                 <div class="form-group">
                     <label for="description">Descripción del Negocio *</label>
                     <textarea id="description" name="description" required placeholder="Ejemplo: Cafetería acogedora con postres caseros"></textarea>
                     <span class="checkmark" id="descriptionCheck"></span>
                     <span class="example">Describe tu negocio en pocas palabras</span>
                 </div>
-
                 <div class="form-group">
                     <label for="publico">Público Objetivo *</label>
                     <input type="text" id="publico" name="publico" required placeholder="Ejemplo: Familias y jóvenes profesionales">
                     <span class="checkmark" id="publicoCheck"></span>
                     <span class="example">¿A quién está dirigido?</span>
                 </div>
-
                 <div class="form-group">
                     <label for="valores">Valores de la Marca *</label>
                     <input type="text" id="valores" name="valores" required placeholder="Ejemplo: Calidez, calidad, tradición">
                     <span class="checkmark" id="valoresCheck"></span>
                     <span class="example">Separa los valores con comas</span>
                 </div>
-
                 <div class="form-group">
                     <label for="origen">Historia del Proyecto *</label>
                     <textarea id="origen" name="origen" required placeholder="Ejemplo: Inspirado en las recetas de mi abuela"></textarea>
@@ -496,7 +529,6 @@
                     </select>
                     <span class="checkmark" id="estiloCheck"></span>
                 </div>
-
                 <div class="form-group">
                     <label for="colores">Colores Preferidos</label>
                     <input type="text" id="colores" name="colores" placeholder="Ejemplo: Azul y blanco">
@@ -506,7 +538,6 @@
                     </div>
                     <span class="example">Opcional, déjalo en blanco si confías en nosotros</span>
                 </div>
-
                 <div class="form-group">
                     <label for="simbolo">Elementos del Logo</label>
                     <input type="text" id="simbolo" name="simbolo" placeholder="Ejemplo: Taza de café">
@@ -516,7 +547,6 @@
                     </div>
                     <span class="example">Opcional, especifica símbolos deseados</span>
                 </div>
-
                 <div class="form-group">
                     <label>Referencias del Logo *</label>
                     <div class="checkbox-container">
@@ -539,7 +569,6 @@
                     <input type="text" id="competencia" name="competencia" placeholder="Ejemplo: Cafeterías locales">
                     <span class="example">Opcional, menciona a tu competencia</span>
                 </div>
-
                 <div class="form-group">
                     <label for="uso-logo">Uso del Logo *</label>
                     <input type="text" id="uso-logo" name="uso-logo" required placeholder="Ejemplo: Redes sociales, empaques">
@@ -559,7 +588,6 @@
                     </div>
                     <span class="example">Opcional, frase representativa</span>
                 </div>
-
                 <div class="form-group">
                     <label for="restricciones">Restricciones de Diseño</label>
                     <textarea id="restricciones" name="restricciones" placeholder="Ejemplo: Evitar colores brillantes"></textarea>
@@ -579,17 +607,14 @@
                     </select>
                     <span class="checkmark" id="paqueteCheck"></span>
                 </div>
-
                 <div class="checkbox-option">
                     <input type="checkbox" id="express" name="express">
                     <label for="express">Entrega Express (+50%)</label>
-                    <span class="example">Si deseas recibir tu diseño en 24-48 horas, selecciona esta opción. El costo adicional cubre la prioridad y dedicación exclusiva del equipo.</span>
+                    <span class="example">Si deseas recibir tu diseño en 24-48 horas, selecciona esta opción.</span>
                 </div>
-
                 <div class="total-container">
                     <div class="total-amount" id="total">$0.00</div>
                 </div>
-
                 <button type="submit">Enviar Solicitud</button>
             </div>
         </form>
@@ -614,32 +639,17 @@
             const paqueteSelect = document.getElementById('paquete');
             const expressCheckbox = document.getElementById('express');
             const totalSpan = document.getElementById('total');
-            const progressBar = document.getElementById('progressBar');
 
-            // Campos requeridos para contar progreso
             const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
-            const totalRequired = requiredFields.length;
 
             const validateField = (input, checkmark) => {
                 checkmark.style.display = input.checkValidity() && input.value.trim() ? 'block' : 'none';
-                updateProgress();
             };
 
             const calculateTotal = () => {
                 const basePrice = parseFloat(paqueteSelect.value) || 0;
                 const total = expressCheckbox.checked ? basePrice * 1.5 : basePrice;
                 totalSpan.textContent = `$${total.toFixed(2)}`;
-            };
-
-            const updateProgress = () => {
-                let completed = 0;
-                requiredFields.forEach(field => {
-                    if (field.checkValidity() && field.value.trim()) {
-                        completed++;
-                    }
-                });
-                const progress = (completed / totalRequired) * 100;
-                progressBar.style.width = `${progress}%`;
             };
 
             paqueteSelect.addEventListener('change', () => {
@@ -709,14 +719,30 @@
                 modal.style.display = 'none';
                 form.reset();
                 totalSpan.textContent = '$0.00';
-                progressBar.style.width = '0%';
                 document.querySelectorAll('.checkmark').forEach(check => check.style.display = 'none');
             });
 
             cancelButton.addEventListener('click', () => modal.style.display = 'none');
 
-            // Actualizar progreso inicial
-            updateProgress();
+            // Animación de aparición y desaparición de secciones
+            const sections = document.querySelectorAll('.section');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    } else {
+                        entry.target.classList.remove('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
         });
     </script>
 </body>
