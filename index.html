@@ -17,6 +17,7 @@
             --border-radius: 12px;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             --transition: all 0.3s ease;
+            --success-color: #00cc00;
         }
 
         * {
@@ -340,7 +341,7 @@
             left: 0;
         }
 
-        .modal {
+        .confirmation-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -353,19 +354,19 @@
             z-index: 2000;
         }
 
-        .modal-content {
+        .confirmation-content {
             background-color: var(--card-background);
-            padding: 1.5rem;
+            padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
+            text-align: center;
             max-width: 400px;
             width: 90%;
-            text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .modal-content::before {
+        .confirmation-content::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -377,16 +378,50 @@
             z-index: -1;
         }
 
-        .modal-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #fff;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
 
-        .modal-buttons button {
-            flex: 1;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .check-icon {
+            display: none;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            color: var(--success-color);
+            font-size: 2.5rem;
+        }
+
+        .confirmation-message {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .whatsapp-button {
+            background-color: #25D366;
             padding: 0.75rem;
+            border-radius: var(--border-radius);
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
             font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .whatsapp-button:hover {
+            background-color: #20b354;
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px #25D366;
         }
 
         @media (max-width: 768px) {
@@ -405,12 +440,9 @@
             .total-breakdown { font-size: 0.875rem; }
             .total-breakdown .total { font-size: 1.125rem; }
             button { padding: 0.875rem; font-size: 1rem; }
-            .modal-content { padding: 1rem; max-width: 90%; }
-            .modal-buttons { gap: 0.5rem; }
-            .modal-buttons button { padding: 0.5rem; font-size: 0.875rem; }
-            .checkbox-option { align-items: flex-start; gap: 0.5rem; }
-            input[type="checkbox"], input[type="radio"] { margin-right: 0.5rem; }
-            .checkbox-option label { font-size: 0.875rem; line-height: 1.2; }
+            .confirmation-content { padding: 1.5rem; }
+            .confirmation-message { font-size: 1rem; }
+            .whatsapp-button { padding: 0.5rem; font-size: 0.875rem; }
         }
 
         @media (max-width: 480px) {
@@ -448,7 +480,7 @@
             <p>Completa los campos a continuación y ¡empecemos a crear!</p>
         </div>
 
-        <form id="logoForm">
+        <form id="logoForm" action="https://formspree.io/f/mrbpzgzw" method="POST">
             <div class="section">
                 <h2 class="section-title">Datos del Cliente</h2>
                 <div class="form-group">
@@ -615,7 +647,7 @@
                 </div>
                 <div class="form-group">
                     <label for="metodo-pago">Método de Pago *</label>
-                    <select id="metodo-pago" name="metodo-pago" required>
+                    <select id="metodo-pago" name="metodo-de-pago" required>
                         <option value="" disabled selected>Selecciona un método de pago</option>
                         <option value="pago-movil">Pago Móvil</option>
                         <option value="transferencia-banesco">Transferencia Banesco</option>
@@ -641,32 +673,44 @@
                     <div class="total-breakdown" id="totalBreakdown">
                         <div><span class="label">Paquete:</span><span class="value" id="packageAmount">$0.00</span></div>
                         <div><span class="label">Servicio Express:</span><span class="value" id="expressAmount">$0.00</span></div>
-                        <div><span class="label">Cupón de descuento:</span><span class="value" id="discountAmount">-$0.00</span></div>
-                        <div id="comisionRow" style="display: none;"><span class="label">Comisión método de pago (8%):</span><span class="value" id="comisionAmount">$0.00</span></div>
+                        <div><span class="label">Cupón de descuento:</span><span class="value" id="discountAmount">$0.00</span></div>
+                        <div id="comisionRow" style="display: none;"><span class="label">Comisión Método de Pago (8%):</span><span class="value" id="comisionAmount">$0.00</span></div>
                         <div class="total"><span class="label">Total:</span><span class="value" id="totalAmount">$0.00</span></div>
                     </div>
                 </div>
-                <button type="submit">Confirmar y Enviar a WhatsApp</button>
+
+                <!-- Campos ocultos para Formspree -->
+                <input type="hidden" name="_subject" value="Nueva Solicitud de Diseño - Pixcro">
+                <input type="hidden" name="_to" value="pixcronegociosvzla@gmail.com">
+                <input type="hidden" name="message" id="formMessage">
+                <input type="hidden" name="_next" value="https://tu-usuario.github.io/tu-repositorio/gracias.html">
+
+                <button type="submit">Confirmar y Enviar</button>
             </div>
         </form>
     </div>
 
-    <div class="modal" id="customModal">
-        <div class="modal-content">
-            <p>Serás redirigido al WhatsApp de Pixcro con la información proporcionada.</p>
-            <div class="modal-buttons">
-                <button id="modalAcceptButton">Aceptar</button>
-                <button id="modalCancelButton">Cancelar</button>
-            </div>
+    <!-- Modal de confirmación -->
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="confirmation-content">
+            <div class="loader" id="loader"></div>
+            <svg class="check-icon" id="checkIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <p class="confirmation-message" id="confirmationMessage"></p>
+            <a href="#" class="whatsapp-button" id="whatsappButton" style="display: none;">Confirmar mediante WhatsApp</a>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('logoForm');
-            const modal = document.getElementById('customModal');
-            const acceptButton = document.getElementById('modalAcceptButton');
-            const cancelButton = document.getElementById('modalCancelButton');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const loader = document.getElementById('loader');
+            const checkIcon = document.getElementById('checkIcon');
+            const confirmationMessage = document.getElementById('confirmationMessage');
+            const whatsappButton = document.getElementById('whatsappButton');
+            const formMessage = document.getElementById('formMessage');
             const paqueteSelect = document.getElementById('paquete');
             const expressCheckbox = document.getElementById('express');
             const couponInput = document.getElementById('coupon');
@@ -766,7 +810,7 @@
 
                 packageAmount.textContent = `$${basePrice.toFixed(2)}`;
                 expressAmount.textContent = `$${expressCost.toFixed(2)}`;
-                discountAmount.textContent = `-$${discountValue.toFixed(2)}`;
+                discountAmount.textContent = `$${discountValue.toFixed(2)}`;
                 comisionAmount.textContent = `$${comision.toFixed(2)}`;
                 comisionRow.style.display = comision > 0 ? 'flex' : 'none';
                 totalAmount.textContent = `$${finalPrice.toFixed(2)}`;
@@ -793,79 +837,108 @@
                 }
             });
 
+            const generateEmailBody = () => {
+                const formData = new FormData(form);
+                let message = "Solicitud de Diseño - Pixcro\n\n";
+
+                message += "Datos del Cliente\n";
+                message += `Nombre: ${formData.get('nombre')}\n`;
+                message += `Apellido: ${formData.get('apellido')}\n`;
+                message += `Correo Electrónico: ${formData.get('correo')}\n`;
+                message += `Teléfono: ${formData.get('telefono') || 'No especificado'}\n\n`;
+
+                message += "Datos del Negocio\n";
+                message += `Nombre del Negocio: ${formData.get('business-name')}\n`;
+                message += `Descripción del Negocio: ${formData.get('description')}\n`;
+                message += `Público Objetivo: ${formData.get('publico')}\n`;
+                message += `Valores de la Marca: ${formData.get('valores')}\n`;
+                message += `Historia del Proyecto: ${formData.get('origen')}\n\n`;
+
+                message += "Estilo y Preferencias\n";
+                message += `Estilo del Logo: ${formData.get('estilo')}\n`;
+                message += `Colores Preferidos: ${formData.get('color-disenador') ? 'A criterio del diseñador' : formData.get('colores') || 'No especificado'}\n`;
+                message += `Elementos del Logo: ${formData.get('simbolo-disenador') ? 'A criterio del diseñador' : formData.get('simbolo') || 'No especificado'}\n`;
+                message += `Referencias del Logo: ${formData.get('referencia') === 'whatsapp' ? 'Enviar por WhatsApp' : 'A criterio del diseñador'}\n\n`;
+
+                message += "Competencia y Contexto\n";
+                message += `Competidores Principales: ${formData.get('competencia') || 'No especificado'}\n`;
+                message += `Uso del Logo: ${formData.get('uso-logo')}\n\n`;
+
+                message += "Información Adicional\n";
+                message += `Eslogan: ${formData.get('no-eslogan') ? 'Sin eslogan' : formData.get('eslogan') || 'No especificado'}\n`;
+                message += `Restricciones de Diseño: ${formData.get('restricciones') || 'No especificado'}\n\n`;
+
+                message += "Paquete y Entrega\n";
+                message += `Paquete: ${paqueteSelect.options[paqueteSelect.selectedIndex].text}\n`;
+                message += `Servicio Express: ${expressCheckbox.checked ? expressAmount.textContent : 'No solicitado'}\n`;
+                message += `Cupón de Descuento: ${appliedCoupon ? `${discountAmount.textContent} (${appliedCoupon})` : 'No aplicado'}\n`;
+                message += `Comisión Método de Pago: ${comisionRow.style.display === 'flex' ? comisionAmount.textContent : 'No aplica'}\n`;
+                message += `Método de Pago: ${metodoPagoSelect.options[metodoPagoSelect.selectedIndex].text}\n`;
+                message += `Monto Total: ${totalAmount.textContent}`;
+
+                return message;
+            };
+
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 if (form.checkValidity()) {
-                    modal.style.display = 'flex';
+                    // Solo enviamos el mensaje personalizado en el campo hidden
+                    formMessage.value = generateEmailBody();
+
+                    // Creamos un FormData limpio con solo los campos necesarios
+                    const cleanFormData = new FormData();
+                    cleanFormData.append('_subject', 'Nueva Solicitud de Diseño - Pixcro');
+                    cleanFormData.append('_to', 'pixcronegociosvzla@gmail.com');
+                    cleanFormData.append('message', formMessage.value);
+                    cleanFormData.append('_next', 'https://tu-usuario.github.io/tu-repositorio/gracias.html');
+
+                    confirmationModal.style.display = 'flex';
+                    loader.style.display = 'block';
+                    checkIcon.style.display = 'none';
+                    confirmationMessage.textContent = '';
+                    whatsappButton.style.display = 'none';
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: cleanFormData,
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            setTimeout(() => {
+                                loader.style.display = 'none';
+                                checkIcon.style.display = 'block';
+                                confirmationMessage.textContent = 'Solicitud enviada, el equipo de Pixcro se comunicará con usted en la brevedad posible';
+                                whatsappButton.style.display = 'inline-block';
+                                whatsappButton.href = 'https://wa.me/+584121138338?text=' + encodeURIComponent('🎯 Listo! He completado el formulario 😁 ¿Pueden verificarlo?');
+
+                                form.reset();
+                                packageAmount.textContent = '$0.00';
+                                expressAmount.textContent = '$0.00';
+                                discountAmount.textContent = '$0.00';
+                                comisionAmount.textContent = '$0.00';
+                                comisionRow.style.display = 'none';
+                                totalAmount.textContent = '$0.00';
+                                appliedCoupon = null;
+                                couponStatus.textContent = 'Ingresa un cupón y valida';
+                                couponStatus.style.color = '#b0b0b0';
+                                comisionMensaje.style.display = 'none';
+                                document.querySelectorAll('.checkmark').forEach(check => check.style.display = 'none');
+                            }, 3000);
+                        } else {
+                            confirmationModal.style.display = 'none';
+                            alert('Hubo un error al enviar la solicitud. Intenta de nuevo.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        confirmationModal.style.display = 'none';
+                        alert('Error al enviar la solicitud. Por favor, intenta de nuevo.');
+                    });
                 } else {
                     form.reportValidity();
                 }
             });
-
-            const generateWhatsAppMessage = () => {
-                const formData = new FormData(form);
-                let message = "*Solicitud de Diseño - Pixcro*\n\n";
-
-                message += "*📋 Cliente*\n";
-                message += `Nombre: ${formData.get('nombre')} ${formData.get('apellido')}\n`;
-                message += `Correo: ${formData.get('correo')}\n`;
-                message += `Teléfono: ${formData.get('telefono') || 'No especificado'}\n\n`;
-
-                message += "*🏢 Negocio*\n";
-                message += `Nombre: ${formData.get('business-name')}\n`;
-                message += `Descripción: ${formData.get('description')}\n`;
-                message += `Público: ${formData.get('publico')}\n`;
-                message += `Valores: ${formData.get('valores')}\n`;
-                message += `Origen: ${formData.get('origen')}\n\n`;
-
-                message += "*🎨 Preferencias*\n";
-                message += `Estilo: ${formData.get('estilo')}\n`;
-                message += `Colores: ${formData.get('color-disenador') ? 'A criterio del diseñador' : formData.get('colores') || 'No especificado'}\n`;
-                message += `Elementos: ${formData.get('simbolo-disenador') ? 'A criterio del diseñador' : formData.get('simbolo') || 'No especificado'}\n`;
-                message += `Referencias: ${formData.get('referencia') === 'whatsapp' ? 'Por WhatsApp' : 'A criterio del diseñador'}\n\n`;
-
-                message += "*📊 Contexto*\n";
-                message += `Competidores: ${formData.get('competencia') || 'No especificado'}\n`;
-                message += `Uso: ${formData.get('uso-logo')}\n\n`;
-
-                message += "*ℹ️ Adicional*\n";
-                message += `Eslogan: ${formData.get('no-eslogan') ? 'Sin eslogan' : formData.get('eslogan') || 'No especificado'}\n`;
-                message += `Restricciones: ${formData.get('restricciones') || 'No especificado'}\n\n`;
-
-                message += "*💰 Paquete*\n";
-                message += `Paquete: ${paqueteSelect.options[paqueteSelect.selectedIndex].text}\n`;
-                message += `Express: ${expressAmount.textContent}\n`;
-                message += `Cupón: ${discountAmount.textContent} (${appliedCoupon || 'Ninguno'})\n`;
-                message += `Comisión método de pago: ${comisionAmount.textContent}\n`;
-                message += `Método de Pago: ${metodoPagoSelect.options[metodoPagoSelect.selectedIndex].text}\n`;
-                message += `Total: ${totalAmount.textContent}`;
-
-                return encodeURIComponent(message);
-            };
-
-            acceptButton.addEventListener('click', () => {
-                acceptButton.textContent = 'Enviando...';
-                const whatsappUrl = `https://wa.me/+584121138338?text=${generateWhatsAppMessage()}`;
-                window.open(whatsappUrl, '_blank');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    form.reset();
-                    acceptButton.textContent = 'Aceptar';
-                    packageAmount.textContent = '$0.00';
-                    expressAmount.textContent = '$0.00';
-                    discountAmount.textContent = '-$0.00';
-                    comisionAmount.textContent = '$0.00';
-                    comisionRow.style.display = 'none';
-                    totalAmount.textContent = '$0.00';
-                    appliedCoupon = null;
-                    couponStatus.textContent = 'Ingresa un cupón y valida';
-                    couponStatus.style.color = '#b0b0b0';
-                    comisionMensaje.style.display = 'none';
-                    document.querySelectorAll('.checkmark').forEach(check => check.style.display = 'none');
-                }, 500);
-            });
-
-            cancelButton.addEventListener('click', () => modal.style.display = 'none');
 
             const sections = document.querySelectorAll('.section');
             const observer = new IntersectionObserver((entries) => {
