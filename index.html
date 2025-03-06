@@ -100,11 +100,9 @@
         }
 
         .section.visible {
-            box-shadow: 0 0 15px rgba(191, 64, 191, 0.3), 0 0 25px rgba(224, 102, 224, 0.2);
-            border: 1px solid rgba(191, 64, 191, 0.2);
-            animation: borderGlow 4s ease-in-out infinite;
             opacity: 1;
             transform: translateY(0);
+            animation: fadeInUp 0.8s ease-out;
         }
 
         .section:not(.visible) {
@@ -112,10 +110,9 @@
             transform: translateY(50px);
         }
 
-        @keyframes borderGlow {
-            0% { box-shadow: 0 0 15px rgba(191, 64, 191, 0.3), 0 0 25px rgba(224, 102, 224, 0.2); }
-            50% { box-shadow: 0 0 20px rgba(191, 64, 191, 0.4), 0 0 30px rgba(224, 102, 224, 0.3); }
-            100% { box-shadow: 0 0 15px rgba(191, 64, 191, 0.3), 0 0 25px rgba(224, 102, 224, 0.2); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .section-title {
@@ -146,6 +143,12 @@
             box-shadow: inset 0 0 5px rgba(191, 64, 191, 0.1);
         }
 
+        input:disabled, textarea:disabled {
+            background-color: #3a3f43;
+            color: #888;
+            cursor: not-allowed;
+        }
+
         textarea { min-height: 120px; resize: vertical; }
 
         select {
@@ -160,6 +163,12 @@
             border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 3px rgba(191, 64, 191, 0.3), inset 0 0 8px rgba(191, 64, 191, 0.2);
+            animation: focusGlow 0.5s ease;
+        }
+
+        @keyframes focusGlow {
+            from { box-shadow: 0 0 0 0 rgba(191, 64, 191, 0); }
+            to { box-shadow: 0 0 0 3px rgba(191, 64, 191, 0.3), inset 0 0 8px rgba(191, 64, 191, 0.2); }
         }
 
         .checkmark {
@@ -300,6 +309,11 @@
             box-shadow: 0 0 15px var(--primary-color);
         }
 
+        button:active {
+            transform: scale(0.98);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
         #validateCoupon {
             background-color: var(--primary-color);
             color: var(--text-color);
@@ -381,16 +395,21 @@
         .loader {
             width: 50px;
             height: 50px;
-            border: 5px solid #fff;
+            border: 5px solid rgba(255, 255, 255, 0.2);
             border-top: 5px solid var(--primary-color);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 1.5s ease-in-out infinite, pulse 1.5s ease-in-out infinite;
             margin: 0 auto 1rem;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.4; }
         }
 
         .check-icon {
@@ -400,6 +419,13 @@
             margin: 0 auto 1rem;
             color: var(--success-color);
             font-size: 2.5rem;
+            animation: checkBounce 0.5s ease;
+        }
+
+        @keyframes checkBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         .confirmation-message {
@@ -422,6 +448,13 @@
             background-color: #20b354;
             transform: translateY(-2px);
             box-shadow: 0 0 10px #25D366;
+        }
+
+        #expressDetails {
+            display: none;
+            margin-top: 0.5rem;
+            color: #b0b0b0;
+            font-size: 0.875rem;
         }
 
         @media (max-width: 768px) {
@@ -496,15 +529,22 @@
                     <span class="example">Tu apellido</span>
                 </div>
                 <div class="form-group">
+                    <label for="cedula">Cédula de Identidad/DNI *</label>
+                    <input type="text" id="cedula" name="cedula" required placeholder="Ejemplo: 12345678">
+                    <span class="checkmark" id="cedulaCheck"></span>
+                    <span class="example">Tu cédula de identidad o DNI</span>
+                </div>
+                <div class="form-group">
                     <label for="correo">Correo Electrónico *</label>
                     <input type="email" id="correo" name="correo" required placeholder="Ejemplo: contacto@miempresa.com">
                     <span class="checkmark" id="correoCheck"></span>
                     <span class="example">Usa un correo activo</span>
                 </div>
                 <div class="form-group">
-                    <label for="telefono">Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" placeholder="Ejemplo: +58 412 1234567">
-                    <span class="example">Opcional, incluye código de país</span>
+                    <label for="telefono">Teléfono *</label>
+                    <input type="tel" id="telefono" name="telefono" required placeholder="Ejemplo: +58 412 1234567">
+                    <span class="checkmark" id="telefonoCheck"></span>
+                    <span class="example">Incluye código de país</span>
                 </div>
             </div>
 
@@ -524,13 +564,13 @@
                 </div>
                 <div class="form-group">
                     <label for="publico">Público Objetivo *</label>
-                    <input type="text" id="publico" name="publico" required placeholder="Ejemplo: Familias y jóvenes profesionales">
+                    <textarea id="publico" name="publico" required placeholder="Ejemplo: Familias y jóvenes profesionales"></textarea>
                     <span class="checkmark" id="publicoCheck"></span>
                     <span class="example">¿A quién está dirigido?</span>
                 </div>
                 <div class="form-group">
                     <label for="valores">Valores de la Marca *</label>
-                    <input type="text" id="valores" name="valores" required placeholder="Ejemplo: Calidez, calidad, tradición">
+                    <textarea id="valores" name="valores" required placeholder="Ejemplo: Calidez, calidad, tradición"></textarea>
                     <span class="checkmark" id="valoresCheck"></span>
                     <span class="example">Separa los valores con comas</span>
                 </div>
@@ -563,19 +603,19 @@
                         <input type="checkbox" id="color-disenador" name="color-disenador">
                         <label for="color-disenador">A criterio del diseñador</label>
                     </div>
-                    <span class="example">Opcional, déjalo en blanco si confías en nosotros</span>
+                    <span class="example">Especifica tus colores preferidos</span>
                 </div>
                 <div class="form-group">
                     <label for="simbolo">Elementos del Logo</label>
-                    <input type="text" id="simbolo" name="simbolo" placeholder="Ejemplo: Taza de café">
+                    <input type="text" id="simbolo" name="simbolo" placeholder="Especifica símbolos deseados">
                     <div class="checkbox-option">
                         <input type="checkbox" id="simbolo-disenador" name="simbolo-disenador">
                         <label for="simbolo-disenador">A criterio del diseñador</label>
                     </div>
-                    <span class="example">Opcional, especifica símbolos deseados</span>
+                    <span class="example">Especifica símbolos deseados</span>
                 </div>
                 <div class="form-group">
-                    <label>Referencias del Logo *</label>
+                    <label>Referencias Visuales del Logo *</label>
                     <div class="checkbox-container">
                         <div class="checkbox-option">
                             <input type="radio" name="referencia" id="ref-disenador" value="disenador" required>
@@ -583,7 +623,7 @@
                         </div>
                         <div class="checkbox-option">
                             <input type="radio" name="referencia" id="ref-whatsapp" value="whatsapp">
-                            <label for="ref-whatsapp">Enviar por WhatsApp</label>
+                            <label for="ref-whatsapp">Enviaré referencias por WhatsApp</label>
                         </div>
                     </div>
                 </div>
@@ -593,14 +633,14 @@
                 <h2 class="section-title">Competencia y Contexto</h2>
                 <div class="form-group">
                     <label for="competencia">Competidores Principales</label>
-                    <input type="text" id="competencia" name="competencia" placeholder="Ejemplo: Cafeterías locales">
+                    <textarea id="competencia" name="competencia" placeholder="Ejemplo: Cafeterías locales"></textarea>
                     <span class="example">Opcional, menciona a tu competencia</span>
                 </div>
                 <div class="form-group">
                     <label for="uso-logo">Uso del Logo *</label>
-                    <input type="text" id="uso-logo" name="uso-logo" required placeholder="Ejemplo: Redes sociales, empaques">
+                    <textarea id="uso-logo" name="uso-logo" required placeholder="Detalla en donde quieres usar tu logo"></textarea>
                     <span class="checkmark" id="usoLogoCheck"></span>
-                    <span class="example">Separa usos con comas</span>
+                    <span class="example">Detalla en donde quieres usar tu logo</span>
                 </div>
             </div>
 
@@ -608,12 +648,12 @@
                 <h2 class="section-title">Información Adicional</h2>
                 <div class="form-group">
                     <label for="eslogan">Eslogan</label>
-                    <input type="text" id="eslogan" name="eslogan" placeholder="Ejemplo: 'Siente el aroma'">
+                    <input type="text" id="eslogan" name="eslogan" placeholder="Frase representativa">
                     <div class="checkbox-option">
                         <input type="checkbox" id="no-eslogan" name="no-eslogan">
                         <label for="no-eslogan">Sin eslogan</label>
                     </div>
-                    <span class="example">Opcional, frase representativa</span>
+                    <span class="example">Frase representativa</span>
                 </div>
                 <div class="form-group">
                     <label for="restricciones">Restricciones de Diseño</label>
@@ -634,10 +674,12 @@
                     </select>
                     <span class="checkmark" id="paqueteCheck"></span>
                 </div>
-                <div class="checkbox-option">
-                    <input type="checkbox" id="express" name="express">
-                    <label for="express">Entrega Express (+50%)</label>
-                    <span class="example">Si deseas recibir tu diseño en 24-48 horas, selecciona esta opción.</span>
+                <div class="form-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="express" name="express">
+                        <label for="express">Entrega Express (+50%)</label>
+                    </div>
+                    <div id="expressDetails" class="example">El servicio express permite que nuestro equipo trabaje horas extras, incluidas noches y fines de semana, para entregar tu proyecto en un plazo de 24 a 48 horas tras confirmar el pago. Esto implica una priorización sobre otros proyectos y un costo adicional del 50% por la dedicación intensiva.</div>
                 </div>
                 <div class="form-group">
                     <label for="coupon">Código de Cupón</label>
@@ -713,6 +755,7 @@
             const formMessage = document.getElementById('formMessage');
             const paqueteSelect = document.getElementById('paquete');
             const expressCheckbox = document.getElementById('express');
+            const expressDetails = document.getElementById('expressDetails');
             const couponInput = document.getElementById('coupon');
             const validateButton = document.getElementById('validateCoupon');
             const couponStatus = document.getElementById('couponStatus');
@@ -724,20 +767,47 @@
             const comisionAmount = document.getElementById('comisionAmount');
             const comisionRow = document.getElementById('comisionRow');
             const totalAmount = document.getElementById('totalAmount');
+            const colorDisenador = document.getElementById('color-disenador');
+            const coloresInput = document.getElementById('colores');
+            const simboloDisenador = document.getElementById('simbolo-disenador');
+            const simboloInput = document.getElementById('simbolo');
+            const noEslogan = document.getElementById('no-eslogan');
+            const esloganInput = document.getElementById('eslogan');
 
             const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
             let coupons = {};
             let appliedCoupon = null;
 
+            // Validación dinámica de campos requeridos
             const validateField = (input, checkmark) => {
                 checkmark.style.display = input.checkValidity() && input.value.trim() ? 'block' : 'none';
             };
 
+            // Deshabilitar inputs cuando se marca "A criterio del diseñador" o "Sin eslogan"
+            colorDisenador.addEventListener('change', () => {
+                coloresInput.disabled = colorDisenador.checked;
+                coloresInput.value = colorDisenador.checked ? '' : coloresInput.value;
+            });
+
+            simboloDisenador.addEventListener('change', () => {
+                simboloInput.disabled = simboloDisenador.checked;
+                simboloInput.value = simboloDisenador.checked ? '' : simboloInput.value;
+            });
+
+            noEslogan.addEventListener('change', () => {
+                esloganInput.disabled = noEslogan.checked;
+                esloganInput.value = noEslogan.checked ? '' : esloganInput.value;
+            });
+
+            // Mostrar/Ocultar detalles del servicio express
+            expressCheckbox.addEventListener('change', () => {
+                expressDetails.style.display = expressCheckbox.checked ? 'block' : 'none';
+                calculateTotal();
+            });
+
+            // Cargar cupones (simulación)
             fetch('cupones.txt')
-                .then(response => {
-                    if (!response.ok) throw new Error('No se pudo cargar cupones.txt');
-                    return response.text();
-                })
+                .then(response => response.ok ? response.text() : Promise.reject('No se pudo cargar cupones.txt'))
                 .then(data => {
                     const lines = data.split('\n').map(line => line.trim()).filter(line => line);
                     lines.forEach(line => {
@@ -748,7 +818,6 @@
                             coupons[code] = discount;
                         }
                     });
-                    console.log('Cupones cargados:', coupons);
                 })
                 .catch(error => {
                     console.error('Error al cargar cupones:', error);
@@ -756,6 +825,7 @@
                     couponStatus.style.color = '#ff4444';
                 });
 
+            // Validación de cupones
             validateButton.addEventListener('click', () => {
                 const enteredCoupon = couponInput.value.trim().toUpperCase();
                 if (!enteredCoupon) {
@@ -780,20 +850,7 @@
                 }
             });
 
-            couponInput.addEventListener('input', () => {
-                const enteredCoupon = couponInput.value.trim().toUpperCase();
-                if (enteredCoupon && coupons.hasOwnProperty(enteredCoupon)) {
-                    couponStatus.textContent = 'Cupón válido';
-                    couponStatus.style.color = '#00cc00';
-                } else if (enteredCoupon) {
-                    couponStatus.textContent = 'Cupón no válido';
-                    couponStatus.style.color = '#ff4444';
-                } else {
-                    couponStatus.textContent = 'Ingresa un cupón y valida';
-                    couponStatus.style.color = '#b0b0b0';
-                }
-            });
-
+            // Cálculo del total
             const calculateTotal = () => {
                 const basePrice = parseFloat(paqueteSelect.value) || 0;
                 let discount = appliedCoupon && coupons[appliedCoupon] ? coupons[appliedCoupon] : 0;
@@ -823,8 +880,6 @@
                 validateField(paqueteSelect, document.getElementById('paqueteCheck'));
             });
 
-            expressCheckbox.addEventListener('change', calculateTotal);
-
             metodoPagoSelect.addEventListener('change', () => {
                 calculateTotal();
                 validateField(metodoPagoSelect, document.getElementById('metodoPagoCheck'));
@@ -837,55 +892,76 @@
                 }
             });
 
+            // Generar cuerpo del correo en texto plano
             const generateEmailBody = () => {
                 const formData = new FormData(form);
-                let message = "Solicitud de Diseño - Pixcro\n\n";
+                const basePrice = parseFloat(paqueteSelect.value) || 0;
+                const discount = appliedCoupon && coupons[appliedCoupon] ? coupons[appliedCoupon] : 0;
+                const discountValue = basePrice * discount;
+                const subtotal = basePrice - discountValue;
+                const expressCost = expressCheckbox.checked ? subtotal * 0.5 : 0;
+                const metodosConComision = ['zinli', 'wally', 'wise', 'meru', 'airtm'];
+                const metodoSeleccionado = metodoPagoSelect.value;
+                const comision = metodosConComision.includes(metodoSeleccionado) ? (subtotal + expressCost) * 0.08 : 0;
 
-                message += "Datos del Cliente\n";
-                message += `Nombre: ${formData.get('nombre')}\n`;
-                message += `Apellido: ${formData.get('apellido')}\n`;
-                message += `Correo Electrónico: ${formData.get('correo')}\n`;
-                message += `Teléfono: ${formData.get('telefono') || 'No especificado'}\n\n`;
+                return `
+🆔 Datos del Cliente
+--------------------------------------
+1. *Nombre:* ${formData.get('nombre')}
+2. *Apellido:* ${formData.get('apellido')}
+3. *Número de Identidad:* ${formData.get('cedula')}
+4. *Correo:* ${formData.get('correo')}
+5. *Teléfono:* ${formData.get('telefono')}
 
-                message += "Datos del Negocio\n";
-                message += `Nombre del Negocio: ${formData.get('business-name')}\n`;
-                message += `Descripción del Negocio: ${formData.get('description')}\n`;
-                message += `Público Objetivo: ${formData.get('publico')}\n`;
-                message += `Valores de la Marca: ${formData.get('valores')}\n`;
-                message += `Historia del Proyecto: ${formData.get('origen')}\n\n`;
+🆔 Datos del Negocio
+--------------------------------------
+1. *Nombre del Negocio:* ${formData.get('business-name')}
+2. *Descripción del Negocio:* ${formData.get('description')}
+3. *Público Objetivo:* ${formData.get('publico')}
+4. *Valores de la Marca:* ${formData.get('valores')}
+5. *Historia del Proyecto:* ${formData.get('origen')}
 
-                message += "Estilo y Preferencias\n";
-                message += `Estilo del Logo: ${formData.get('estilo')}\n`;
-                message += `Colores Preferidos: ${formData.get('color-disenador') ? 'A criterio del diseñador' : formData.get('colores') || 'No especificado'}\n`;
-                message += `Elementos del Logo: ${formData.get('simbolo-disenador') ? 'A criterio del diseñador' : formData.get('simbolo') || 'No especificado'}\n`;
-                message += `Referencias del Logo: ${formData.get('referencia') === 'whatsapp' ? 'Enviar por WhatsApp' : 'A criterio del diseñador'}\n\n`;
+🎨 Estilo y Preferencias
+--------------------------------------
+1. *Estilo del Logo:* ${formData.get('estilo')}
+2. *Colores Preferidos:* ${formData.get('color-disenador') ? 'A criterio del diseñador' : formData.get('colores') || 'No especificado'}
+3. *Elementos del Logo:* ${formData.get('simbolo-disenador') ? 'A criterio del diseñador' : formData.get('simbolo') || 'No especificado'}
+4. *Referencias Visuales del Logo:* ${formData.get('referencia') === 'whatsapp' ? 'Enviaré referencias por WhatsApp' : 'A criterio del diseñador'}
 
-                message += "Competencia y Contexto\n";
-                message += `Competidores Principales: ${formData.get('competencia') || 'No especificado'}\n`;
-                message += `Uso del Logo: ${formData.get('uso-logo')}\n\n`;
+🏢 Competencia y Contexto
+--------------------------------------
+1. *Competidores Principales:* ${formData.get('competencia') || 'No especificado'}
+2. *Uso del Logo:* ${formData.get('uso-logo')}
 
-                message += "Información Adicional\n";
-                message += `Eslogan: ${formData.get('no-eslogan') ? 'Sin eslogan' : formData.get('eslogan') || 'No especificado'}\n`;
-                message += `Restricciones de Diseño: ${formData.get('restricciones') || 'No especificado'}\n\n`;
+ℹ️ Información Adicional
+--------------------------------------
+1. *Eslogan:* ${formData.get('no-eslogan') ? 'Sin eslogan' : formData.get('eslogan') || 'No especificado'}
+2. *Restricciones de Diseño:* ${formData.get('restricciones') || 'No especificado'}
 
-                message += "Paquete y Entrega\n";
-                message += `Paquete: ${paqueteSelect.options[paqueteSelect.selectedIndex].text}\n`;
-                message += `Servicio Express: ${expressCheckbox.checked ? expressAmount.textContent : 'No solicitado'}\n`;
-                message += `Cupón de Descuento: ${appliedCoupon ? `${discountAmount.textContent} (${appliedCoupon})` : 'No aplicado'}\n`;
-                message += `Comisión Método de Pago: ${comisionRow.style.display === 'flex' ? comisionAmount.textContent : 'No aplica'}\n`;
-                message += `Método de Pago: ${metodoPagoSelect.options[metodoPagoSelect.selectedIndex].text}\n`;
-                message += `Monto Total: ${totalAmount.textContent}`;
+💳 Paquete y Entrega
+--------------------------------------
+1. *Paquete Seleccionado:* ${paqueteSelect.options[paqueteSelect.selectedIndex].text}
+2. *Servicio Express:* ${expressCheckbox.checked ? 'Sí' : 'No'}
+3. *Cupón de Descuento:* ${appliedCoupon ? appliedCoupon : 'No aplicado'}
+4. *Método de Pago:* ${metodoPagoSelect.options[metodoPagoSelect.selectedIndex].text}
 
-                return message;
+📑 Factura
+--------------------------------------
+*Paquete:* $${basePrice.toFixed(2)}
+*Servicio Express (+50%):* $${expressCost.toFixed(2)}
+*Descuento por Cupón:* -$${discountValue.toFixed(2)}
+*Comisión Método de Pago (8%):* $${comision.toFixed(2)}
+--------------------------------------
+*Total a Pagar:* $${(subtotal + expressCost + comision).toFixed(2)}
+                `;
             };
 
+            // Envío del formulario
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 if (form.checkValidity()) {
-                    // Solo enviamos el mensaje personalizado en el campo hidden
                     formMessage.value = generateEmailBody();
 
-                    // Creamos un FormData limpio con solo los campos necesarios
                     const cleanFormData = new FormData();
                     cleanFormData.append('_subject', 'Nueva Solicitud de Diseño - Pixcro');
                     cleanFormData.append('_to', 'pixcronegociosvzla@gmail.com');
@@ -924,6 +1000,10 @@
                                 couponStatus.style.color = '#b0b0b0';
                                 comisionMensaje.style.display = 'none';
                                 document.querySelectorAll('.checkmark').forEach(check => check.style.display = 'none');
+                                coloresInput.disabled = false;
+                                simboloInput.disabled = false;
+                                esloganInput.disabled = false;
+                                expressDetails.style.display = 'none';
                             }, 3000);
                         } else {
                             confirmationModal.style.display = 'none';
@@ -940,6 +1020,7 @@
                 }
             });
 
+            // Animación de secciones
             const sections = document.querySelectorAll('.section');
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -949,10 +1030,7 @@
                         entry.target.classList.remove('visible');
                     }
                 });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
             sections.forEach(section => observer.observe(section));
         });
